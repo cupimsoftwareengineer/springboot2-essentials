@@ -12,10 +12,10 @@ import java.util.List;
 @Log4j2
 public class SpringClient {
     public static void main(String[] args) {
-        ResponseEntity<Anime> entity = new RestTemplate().getForEntity("http://localhost:8080/animes/{id}", Anime.class, 5);
+        ResponseEntity<Anime> entity = new RestTemplate().getForEntity("http://localhost:8080/animes/{id}", Anime.class, 3);
         log.info(entity);
 
-        Anime object = new RestTemplate().getForObject("http://localhost:8080/animes/{id}", Anime.class, 5);
+        Anime object = new RestTemplate().getForObject("http://localhost:8080/animes/{id}", Anime.class, 3);
 
         log.info(object);
 
@@ -41,6 +41,24 @@ public class SpringClient {
                 Anime.class);
 
         log.info("saved anime {}", samuraiChamplooSaved);
+
+        Anime animeToBeUpdated = samuraiChamplooSaved.getBody();
+        animeToBeUpdated.setName("Samurai Champloo 2");
+
+        ResponseEntity<Void> samuraiChamplooUpdated = new RestTemplate().exchange("http://localhost:8080/animes/",
+                HttpMethod.PUT,
+                new HttpEntity<>(animeToBeUpdated, createJsonHeader()),
+                Void.class);
+
+        log.info(samuraiChamplooUpdated);
+
+        ResponseEntity<Void> samuraiChamplooDeleted = new RestTemplate().exchange("http://localhost:8080/animes/{id}",
+                HttpMethod.DELETE,
+                null,
+                Void.class,
+                animeToBeUpdated.getId());
+
+        log.info(samuraiChamplooDeleted);
     }
 
     private static HttpHeaders createJsonHeader() {
